@@ -7,7 +7,7 @@ on:
 
 env:
   MLFLOW_TRACKING_URI: http://127.0.0.1:5000
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # ou deixe vazio se usar Ollama
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
 jobs:
   evaluate:
@@ -24,10 +24,13 @@ jobs:
       - name: Start MLflow server
         run: |
           uv run mlflow server --host 127.0.0.1 --port 5000 &
-          for i in $(seq 1 20); do
-            curl -sf http://127.0.0.1:5000/health && break
-            echo "Waiting for MLflow... ($i)"
-            sleep 3
+          # Poll the experiments API — /health returns 200 before the store is ready
+          for i in $(seq 1 30); do
+            curl -sf "http://127.0.0.1:5000/api/2.0/mlflow/experiments/search" \
+              -X POST -H "Content-Type: application/json" -d '{"max_results":1}' \
+              && break
+            echo "Waiting for MLflow API... ($i/30)"
+            sleep 2
           done
 
       - name: Run evaluation
