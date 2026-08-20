@@ -31,8 +31,8 @@ jobs:
           data = json.load(sys.stdin)
           models = [m['name'] for m in data.get('models', [])]
           print(f'Available models: {models}')
-          if not any('llama3.1' in m for m in models):
-              print('ERROR: llama3.1 not found in Ollama')
+          if not any('qwen2.5' in m for m in models):
+              print('ERROR: qwen2.5:14b not found in Ollama')
               sys.exit(1)
           "
 
