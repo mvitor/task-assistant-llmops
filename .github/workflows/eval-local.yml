@@ -1,7 +1,9 @@
 name: LLMOps Evaluation (Local)
 
 on:
-  workflow_dispatch:  # permite rodar manualmente
+  workflow_dispatch:
+  push:
+    branches: ["**"]
   pull_request:
     branches: [main]
 
