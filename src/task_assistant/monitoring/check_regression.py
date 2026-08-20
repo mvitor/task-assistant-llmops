@@ -5,7 +5,7 @@ import os
 BASELINE_FILE = "src/task_assistant/monitoring/baseline_scores.json"
 CURRENT_FILE = "src/task_assistant/monitoring/current_scores.json"
 
-REGRESSION_THRESHOLD = 0.15  # 15% tolerance — accounts for LLM output variance
+REGRESSION_THRESHOLD = 0.30  # with n=10 samples, 1 answer flip = 0.1 swing; 0.30 requires 3+ flips
 
 if not os.path.exists(BASELINE_FILE):
     print("⚠️  No baseline found. Creating baseline from current scores.")

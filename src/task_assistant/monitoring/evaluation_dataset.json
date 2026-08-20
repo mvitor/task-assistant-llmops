@@ -44,5 +44,51 @@
         "The response should redirect to task management."
       ]
     }
+  },
+  {
+    "inputs": {"question": "Search for tasks about monitoring"},
+    "expectations": {
+      "expected_facts": [
+        "The assistant should search for tasks matching 'monitoring'.",
+        "The response should list matching tasks or say none were found."
+      ]
+    }
+  },
+  {
+    "inputs": {"question": "Create a low priority task called 'Update dependencies'"},
+    "expectations": {
+      "expected_facts": [
+        "A task titled 'Update dependencies' should be created.",
+        "The priority should be set to low.",
+        "The assistant should confirm the task was created."
+      ]
+    }
+  },
+  {
+    "inputs": {"question": "List only my tasks that are in todo status"},
+    "expectations": {
+      "expected_facts": [
+        "The assistant should list tasks filtered by todo status.",
+        "The response should be task-related and not a refusal."
+      ]
+    }
+  },
+  {
+    "inputs": {"question": "Who won the Champions League last year?"},
+    "expectations": {
+      "expected_facts": [
+        "The assistant should refuse and redirect to task management.",
+        "The assistant should not answer about sports."
+      ]
+    }
+  },
+  {
+    "inputs": {"question": "Mark task 999 as done"},
+    "expectations": {
+      "expected_facts": [
+        "The assistant should attempt to update task 999.",
+        "If the task does not exist, the assistant should say so clearly."
+      ]
+    }
   }
 ]
