@@ -8,13 +8,13 @@ on:
     branches: [main]
 
 env:
-  MLFLOW_TRACKING_URI: http://127.0.0.1:5001
+  MLFLOW_TRACKING_URI: http://127.0.0.1:5000
   OPENAI_API_KEY: ollama
   OPENAI_API_BASE: http://127.0.0.1:11434/v1
 
 jobs:
   evaluate:
-    runs-on: self-hosted  # usa seu MacBook
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -23,28 +23,6 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --python 3.13
-
-      - name: Start MLflow server
-        run: |
-          uv run mlflow server \
-            --host 127.0.0.1 \
-            --port 5001 \
-            --backend-store-uri sqlite:////tmp/mlruns-ci.db \
-            --artifacts-destination /tmp/mlartifacts-ci &
-          for i in $(seq 1 30); do
-            curl -sf "http://127.0.0.1:5001/api/2.0/mlflow/experiments/search" \
-              -X POST -H "Content-Type: application/json" -d '{"max_results":1}' \
-              && break
-            echo "Waiting for MLflow API... ($i/30)"
-            sleep 2
-          done
-          # Force store initialisation — ensures get-by-name works before the script imports agents.py
-          uv run python -c "
-          import mlflow
-          mlflow.set_tracking_uri('http://127.0.0.1:5001')
-          mlflow.set_experiment('task-assistant')
-          print('MLflow store initialised')
-          "
 
       - name: Check Ollama is running
         run: |
