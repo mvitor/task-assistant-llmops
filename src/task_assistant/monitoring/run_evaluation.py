@@ -45,7 +45,7 @@ scorers = [
     ),
 ]
 
-mlflow.set_experiment("task-assistant-evaluation-local")
+mlflow.set_experiment("task-assistant-evaluation")
 
 # Smoke-test the judge model before running full evaluation
 try:
