@@ -27,9 +27,10 @@ def bot_answer(question: str) -> str:
     return result.output
 
 
-# Native LiteLLM Ollama provider — requires OLLAMA_API_BASE env var
-JUDGE_MODEL = "ollama/llama3.1"
-os.environ.setdefault("OLLAMA_API_BASE", "http://localhost:11434")
+# MLflow judge model URI format: provider:/model-name (not LiteLLM slash format)
+JUDGE_MODEL = "openai:/llama3.1"
+os.environ.setdefault("OPENAI_API_KEY", "ollama")
+os.environ.setdefault("OPENAI_API_BASE", "http://localhost:11434/v1")
 
 scorers = [
     Correctness(name="factual_accuracy", model=JUDGE_MODEL),
