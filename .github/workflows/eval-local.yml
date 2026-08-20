@@ -43,6 +43,18 @@ jobs:
           print('MLflow store initialised')
           "
 
+      - name: Check Ollama is running
+        run: |
+          curl -sf http://127.0.0.1:11434/api/tags | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          models = [m['name'] for m in data.get('models', [])]
+          print(f'Available models: {models}')
+          if not any('llama3.1' in m for m in models):
+              print('ERROR: llama3.1 not found in Ollama')
+              sys.exit(1)
+          "
+
       - name: Run evaluation
         run: |
           uv run python src/task_assistant/monitoring/run_evaluation.py
