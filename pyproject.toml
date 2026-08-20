@@ -1,0 +1,26 @@
+[project]
+name = "task-assistant"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Marcio Matos", email = "cromo.jml@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "ipykernel>=7.3.0",
+    "mlflow>=3.15.1",
+    "pydantic-ai>=2.32.0",
+    "sqlalchemy>=2.0.52",
+    "streamlit>=1.62.0",
+    "uvicorn>=0.52.4",
+]
+
+[project.scripts]
+task-assistant = "task_assistant:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

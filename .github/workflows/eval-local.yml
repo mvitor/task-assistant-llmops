@@ -1,0 +1,50 @@
+name: LLMOps Evaluation (Local)
+
+on:
+  workflow_dispatch:  # permite rodar manualmente
+  pull_request:
+    branches: [main]
+
+env:
+  MLFLOW_TRACKING_URI: http://127.0.0.1:5000
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # ou deixe vazio se usar Ollama
+
+jobs:
+  evaluate:
+    runs-on: self-hosted  # usa seu MacBook
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        run: |
+          uv sync
+
+      - name: Start MLflow server
+        run: |
+          uv run mlflow server --host 127.0.0.1 --port 5000 &
+          sleep 5  # espera o MLflow subir
+
+      - name: Run evaluation
+        run: |
+          uv run python monitoring/run_evaluation.py
+
+      - name: Check regression vs baseline
+        run: |
+          uv run python monitoring/check_regression.py
+
+      - name: Upload evaluation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: |
+            monitoring/current_scores.json
+            monitoring/evaluation_results/
