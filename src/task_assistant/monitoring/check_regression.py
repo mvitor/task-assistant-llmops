@@ -2,8 +2,8 @@ import json
 import sys
 import os
 
-BASELINE_FILE = "monitoring/baseline_scores.json"
-CURRENT_FILE = "monitoring/current_scores.json"
+BASELINE_FILE = "src/task_assistant/monitoring/baseline_scores.json"
+CURRENT_FILE = "src/task_assistant/monitoring/current_scores.json"
 
 REGRESSION_THRESHOLD = 0.05  # 5% tolerância
 

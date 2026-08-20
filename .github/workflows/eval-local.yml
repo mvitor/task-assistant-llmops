@@ -14,6 +14,8 @@ jobs:
     runs-on: self-hosted  # usa seu MacBook
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: .  # check out into the runner's workspace root, not a subdirectory
 
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -28,16 +30,16 @@ jobs:
 
       - name: Run evaluation
         run: |
-          uv run python monitoring/run_evaluation.py
+          uv run python src/task_assistant/monitoring/run_evaluation.py
 
       - name: Check regression vs baseline
         run: |
-          uv run python monitoring/check_regression.py
+          uv run python src/task_assistant/monitoring/check_regression.py
 
       - name: Upload evaluation results
         uses: actions/upload-artifact@v4
         with:
           name: eval-results
           path: |
-            monitoring/current_scores.json
-            monitoring/evaluation_results/
+            src/task_assistant/monitoring/current_scores.json
+            src/task_assistant/monitoring/evaluation_results/

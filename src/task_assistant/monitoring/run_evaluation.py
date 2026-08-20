@@ -13,7 +13,9 @@ mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
 
 experiment = mlflow.get_experiment_by_name(MLFLOW_EXPERIMENT_NAME)
 
-with open("monitoring/evaluation_dataset.json") as f:
+BASELINE_DIR = "src/task_assistant/monitoring"
+
+with open(f"{BASELINE_DIR}/evaluation_dataset.json") as f:
     eval_data = json.load(f)
 
 dataset = create_dataset(
@@ -55,9 +57,9 @@ results = evaluate(
 )
 
 # Salva scores
-os.makedirs("monitoring/evaluation_results", exist_ok=True)
+os.makedirs("src/task_assistant/monitoring/evaluation_results", exist_ok=True)
 
-with open("monitoring/current_scores.json", "w") as f:
+with open("src/task_assistant/monitoring/current_scores.json", "w") as f:
     json.dump(
         {
             "factual_accuracy_mean": results.metrics["factual_accuracy/mean"],
@@ -68,7 +70,7 @@ with open("monitoring/current_scores.json", "w") as f:
     )
 
 # Salva resultados detalhados
-with open("monitoring/evaluation_results/results.json", "w") as f:
+with open("src/task_assistant/monitoring/evaluation_results/results.json", "w") as f:
     json.dump(results.metrics, f, indent=2)
 
 print("✅ Evaluation completed")
