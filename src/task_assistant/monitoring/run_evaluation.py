@@ -26,7 +26,9 @@ dataset = create_dataset(
 dataset.merge_records(eval_data)
 
 import asyncio
-from task_assistant.backend.agents import task_agent
+from task_assistant.backend.agents import task_agent, init_db
+
+init_db()
 
 def bot_answer(question: str) -> str:
     result = asyncio.run(task_agent.run(question))
