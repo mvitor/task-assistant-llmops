@@ -175,4 +175,6 @@ pyrightconfig.json
 *.lock
 traces.json
 *.db
+
+_actions/
 # End of https://www.toptal.com/developers/gitignore/api/python
