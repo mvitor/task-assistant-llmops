@@ -28,7 +28,7 @@ def bot_answer(question: str) -> str:
 
 
 # MLflow judge model URI format: provider:/model-name (not LiteLLM slash format)
-JUDGE_MODEL = "openai:/qwen2.5:14b"
+JUDGE_MODEL = "openai:/qwen2.5:latest"
 os.environ.setdefault("OPENAI_API_KEY", "ollama")
 os.environ.setdefault("OPENAI_API_BASE", "http://localhost:11434/v1")
 

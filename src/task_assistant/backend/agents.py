@@ -59,7 +59,7 @@ def _load_system_prompt() -> str:
 
 task_agent = Agent(
     model=OpenAIChatModel(
-        model_name="qwen2.5:14b",
+        model_name="qwen2.5:latest",
         provider=OpenAIProvider(
             api_key="ollama",
             base_url="http://127.0.0.1:11434/v1",
