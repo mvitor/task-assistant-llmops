@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 env:
-  MLFLOW_TRACKING_URI: http://127.0.0.1:5000
+  MLFLOW_TRACKING_URI: http://127.0.0.1:5001
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
 jobs:
@@ -23,15 +23,25 @@ jobs:
 
       - name: Start MLflow server
         run: |
-          uv run mlflow server --host 127.0.0.1 --port 5000 &
-          # Poll the experiments API — /health returns 200 before the store is ready
+          uv run mlflow server \
+            --host 127.0.0.1 \
+            --port 5001 \
+            --backend-store-uri sqlite:////tmp/mlruns-ci.db \
+            --artifacts-destination /tmp/mlartifacts-ci &
           for i in $(seq 1 30); do
-            curl -sf "http://127.0.0.1:5000/api/2.0/mlflow/experiments/search" \
+            curl -sf "http://127.0.0.1:5001/api/2.0/mlflow/experiments/search" \
               -X POST -H "Content-Type: application/json" -d '{"max_results":1}' \
               && break
             echo "Waiting for MLflow API... ($i/30)"
             sleep 2
           done
+          # Force store initialisation — ensures get-by-name works before the script imports agents.py
+          uv run python -c "
+          import mlflow
+          mlflow.set_tracking_uri('http://127.0.0.1:5001')
+          mlflow.set_experiment('task-assistant')
+          print('MLflow store initialised')
+          "
 
       - name: Run evaluation
         run: |
