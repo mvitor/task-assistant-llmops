@@ -54,23 +54,32 @@ results = evaluate(
     scorers=scorers,
 )
 
-# Salva scores
 os.makedirs("src/task_assistant/monitoring/evaluation_results", exist_ok=True)
+
+print(f"Available metrics: {list(results.metrics.keys())}")
+
+factual_accuracy = results.metrics.get("factual_accuracy/mean", -1.0)
+task_quality = results.metrics.get("task_assistant_quality/mean", -1.0)
+
+if factual_accuracy < 0 or task_quality < 0:
+    print("⚠️  One or more LLM judges failed — scores set to -1. Check judge model connectivity.")
 
 with open("src/task_assistant/monitoring/current_scores.json", "w") as f:
     json.dump(
         {
-            "factual_accuracy_mean": results.metrics["factual_accuracy/mean"],
-            "task_assistant_quality_mean": results.metrics["task_assistant_quality/mean"],
+            "factual_accuracy_mean": factual_accuracy,
+            "task_assistant_quality_mean": task_quality,
         },
         f,
         indent=2,
     )
 
-# Salva resultados detalhados
 with open("src/task_assistant/monitoring/evaluation_results/results.json", "w") as f:
     json.dump(results.metrics, f, indent=2)
 
 print("✅ Evaluation completed")
-print(f"Factual accuracy: {results.metrics['factual_accuracy/mean']:.3f}")
-print(f"Task assistant quality: {results.metrics['task_assistant_quality/mean']:.3f}")
+print(f"Factual accuracy: {factual_accuracy:.3f}")
+print(f"Task assistant quality: {task_quality:.3f}")
+
+if factual_accuracy < 0 or task_quality < 0:
+    raise SystemExit("Scorer failures detected — marking run as failed.")
