@@ -46,7 +46,17 @@ scorers = [
 
 mlflow.set_experiment("task-assistant-evaluation-local")
 
-# eval_data is passed directly — create_dataset requires Databricks
+# Smoke-test the judge model before running full evaluation
+try:
+    test_feedback = Correctness(name="factual_accuracy", model=JUDGE_MODEL)(
+        inputs={"question": "test"},
+        outputs="test response",
+        expectations={"expected_facts": ["test fact"]},
+    )
+    print(f"Judge model smoke test passed: {test_feedback}")
+except Exception as e:
+    raise SystemExit(f"Judge model unreachable — cannot run evaluation: {e}")
+
 results = evaluate(
     data=eval_data,
     predict_fn=bot_answer,
