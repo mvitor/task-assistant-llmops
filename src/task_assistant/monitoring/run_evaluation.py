@@ -1,9 +1,12 @@
+import asyncio
 import json
 import os
+
 import mlflow
-from mlflow.genai.datasets import create_dataset
 from mlflow.genai import evaluate
 from mlflow.genai.scorers import Correctness, Guidelines
+
+from task_assistant.backend.agents import task_agent, init_db
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
 MLFLOW_EXPERIMENT_NAME = "task-assistant"
@@ -11,31 +14,23 @@ MLFLOW_EXPERIMENT_NAME = "task-assistant"
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
 
-experiment = mlflow.get_experiment_by_name(MLFLOW_EXPERIMENT_NAME)
+init_db()
 
 BASELINE_DIR = "src/task_assistant/monitoring"
 
 with open(f"{BASELINE_DIR}/evaluation_dataset.json") as f:
     eval_data = json.load(f)
 
-dataset = create_dataset(
-    name="task-assistant-eval-local",
-    experiment_id=experiment.experiment_id,
-    tags={"stage": "ci", "domain": "task-assistant"},
-)
-dataset.merge_records(eval_data)
-
-import asyncio
-from task_assistant.backend.agents import task_agent, init_db
-
-init_db()
 
 def bot_answer(question: str) -> str:
     result = asyncio.run(task_agent.run(question))
     return result.output
 
-# Usa Ollama local como judge (ou OpenAI se tiver key)
-JUDGE_MODEL = "ollama:/llama3.1:latest"
+
+# LiteLLM format for Ollama: openai/model with base URL env var
+JUDGE_MODEL = "openai/llama3.1:latest"
+os.environ.setdefault("OPENAI_API_KEY", "ollama")
+os.environ.setdefault("OPENAI_BASE_URL", "http://localhost:11434/v1")
 
 scorers = [
     Correctness(name="factual_accuracy", model=JUDGE_MODEL),
@@ -52,8 +47,9 @@ scorers = [
 
 mlflow.set_experiment("task-assistant-evaluation-local")
 
+# eval_data is passed directly — create_dataset requires Databricks
 results = evaluate(
-    data=dataset,
+    data=eval_data,
     predict_fn=bot_answer,
     scorers=scorers,
 )
