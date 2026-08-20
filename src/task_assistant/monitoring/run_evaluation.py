@@ -27,10 +27,10 @@ def bot_answer(question: str) -> str:
     return result.output
 
 
-# LiteLLM format for Ollama: openai/model with base URL env var
+# LiteLLM uses OPENAI_API_BASE (not OPENAI_BASE_URL which is the OpenAI SDK var)
 JUDGE_MODEL = "openai/llama3.1:latest"
 os.environ.setdefault("OPENAI_API_KEY", "ollama")
-os.environ.setdefault("OPENAI_BASE_URL", "http://localhost:11434/v1")
+os.environ.setdefault("OPENAI_API_BASE", "http://localhost:11434/v1")
 
 scorers = [
     Correctness(name="factual_accuracy", model=JUDGE_MODEL),
