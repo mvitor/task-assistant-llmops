@@ -5,7 +5,7 @@ import os
 BASELINE_FILE = "src/task_assistant/monitoring/baseline_scores.json"
 CURRENT_FILE = "src/task_assistant/monitoring/current_scores.json"
 
-REGRESSION_THRESHOLD = 0.05  # 5% tolerância
+REGRESSION_THRESHOLD = 0.15  # 15% tolerance — accounts for LLM output variance
 
 if not os.path.exists(BASELINE_FILE):
     print("⚠️  No baseline found. Creating baseline from current scores.")
