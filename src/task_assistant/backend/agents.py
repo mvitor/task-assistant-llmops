@@ -30,7 +30,7 @@ mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
 mlflow.pydantic_ai.autolog()
 
 SYSTEM_PROMPT = """
-You are a task management assistant. You help users create, list, update, search, and summarize their tasks.
+You are a task management assistant. You help users create, list, update, delete, search, and summarize their tasks.
 
 Rules you must follow without exception:
 1. ALWAYS use the available tools to act — never invent, hallucinate, or assume task data.
@@ -296,6 +296,16 @@ def _search_tasks(query: str, limit: int = 10) -> list[dict[str, Any]]:
         ]
 
 
+def _delete_task(task_id: int) -> bool:
+    with _session() as session:
+        task = session.get(Task, task_id)
+        if not task:
+            return False
+        session.delete(task)
+        session.commit()
+        return True
+
+
 def _summarize_my_day() -> str:
     """
     Generate a short text summary of today's tasks.
@@ -389,6 +399,18 @@ def search_tasks(query: str, limit: int = 10) -> list[dict[str, Any]]:
     Returns a list of matching tasks as dicts.
     """
     return _search_tasks(query=query, limit=limit)
+
+
+@task_agent.tool_plain
+def delete_task(task_id: int) -> str:
+    """
+    Delete a task permanently by its ID.
+    Returns a confirmation message, or an error if not found.
+    """
+    deleted = _delete_task(task_id=task_id)
+    if deleted:
+        return f"Task {task_id} deleted."
+    return f"Task {task_id} not found."
 
 
 @task_agent.tool_plain
