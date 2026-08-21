@@ -27,7 +27,7 @@ JUDGE_MODEL = "openai:/qwen2.5:latest"
 
 def bot_answer(question: str) -> str:
     try:
-        result = asyncio.run(task_agent.run(question))
+        result = asyncio.run(asyncio.wait_for(task_agent.run(question), timeout=90))
         return result.output
     except Exception as e:
         return f"Error: {e}"

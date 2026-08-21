@@ -115,7 +115,7 @@ if prompt:
                     "user_id": st.session_state.user_id,
                     "session_id": st.session_state.session_id,
                 }
-                resp = requests.post(CHAT_ENDPOINT, json=payload, timeout=30)
+                resp = requests.post(CHAT_ENDPOINT, json=payload, timeout=120)
                 resp.raise_for_status()
                 data = resp.json()
                 assistant_message = data.get("response", "No response from API.")

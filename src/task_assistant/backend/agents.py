@@ -59,13 +59,23 @@ def _load_system_prompt() -> str:
     return SYSTEM_PROMPT
 
 
+from pydantic_ai import Agent
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from openai import AsyncOpenAI
+import httpx
+
+_ollama_client = AsyncOpenAI(
+    api_key="ollama",
+    base_url="http://127.0.0.1:11434/v1",
+    timeout=httpx.Timeout(120.0, connect=10.0),
+    max_retries=2,
+)
+
 task_agent = Agent(
     model=OpenAIChatModel(
         model_name="qwen2.5:latest",
-        provider=OpenAIProvider(
-            api_key="ollama",
-            base_url="http://127.0.0.1:11434/v1",
-        ),
+        provider=OpenAIProvider(openai_client=_ollama_client),
     ),
     system_prompt=_load_system_prompt(),
 )
