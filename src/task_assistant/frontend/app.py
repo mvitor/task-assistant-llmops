@@ -62,6 +62,16 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
+    if st.button("🗑️ New conversation"):
+        session_id = st.session_state.session_id
+        try:
+            requests.delete(f"{API_BASE_URL}/session/{session_id}", timeout=2)
+        except Exception:
+            pass
+        st.session_state.messages = []
+        st.rerun()
+
+    st.markdown("---")
     # Health check
     try:
         resp = requests.get(HEALTH_ENDPOINT, timeout=2)

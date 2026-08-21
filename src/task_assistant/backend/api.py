@@ -11,6 +11,7 @@ import uvicorn
 
 from task_assistant.backend.agents import init_db
 from task_assistant.backend.middleware import MLflowLoggingMiddleware, register_prompts
+from task_assistant.backend.memory import get_history, save_history
 
 
 
@@ -63,12 +64,24 @@ async def health() -> HealthResponse:
 async def chat(req: ChatRequest) -> ChatResponse:
     from task_assistant.backend.agents import task_agent
 
-    result = await task_agent.run(req.message)
+    session_id = req.session_id or req.user_id
+    history = get_history(session_id)
+
+    result = await task_agent.run(req.message, message_history=history)
+
+    save_history(session_id, result.new_messages())
 
     return ChatResponse(
         response=result.output,
         metadata={},
     )
+
+
+@app.delete("/session/{session_id}")
+async def clear_session(session_id: str) -> dict[str, str]:
+    from task_assistant.backend.memory import clear_history
+    clear_history(session_id)
+    return {"status": "cleared", "session_id": session_id}
 
 
 # -----------------------------------------------------------------------------

@@ -74,6 +74,18 @@ class Base(DeclarativeBase):
     pass
 
 
+class ConversationSession(Base):
+    __tablename__ = "conversation_sessions"
+
+    session_id: Mapped[str] = mapped_column(String(255), primary_key=True)
+    history_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+
 class Task(Base):
     __tablename__ = "tasks"
 
