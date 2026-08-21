@@ -22,15 +22,20 @@ with open(f"{BASELINE_DIR}/evaluation_dataset.json") as f:
     eval_data = json.load(f)
 
 
-def bot_answer(question: str) -> str:
-    result = asyncio.run(task_agent.run(question))
-    return result.output
-
-
-# MLflow judge model URI format: provider:/model-name (not LiteLLM slash format)
 JUDGE_MODEL = "openai:/qwen2.5:latest"
-os.environ.setdefault("OPENAI_API_KEY", "ollama")
-os.environ.setdefault("OPENAI_API_BASE", "http://localhost:11434/v1")
+
+
+def bot_answer(question: str) -> str:
+    try:
+        result = asyncio.run(task_agent.run(question))
+        return result.output
+    except Exception as e:
+        return f"Error: {e}"
+
+
+# Force-set to guarantee judge always hits Ollama, even if env var was previously exported
+os.environ["OPENAI_API_KEY"] = "ollama"
+os.environ["OPENAI_API_BASE"] = "http://localhost:11434/v1"
 
 scorers = [
     Correctness(name="factual_accuracy", model=JUDGE_MODEL),
