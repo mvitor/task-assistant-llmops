@@ -63,11 +63,14 @@ try:
 except Exception as e:
     raise SystemExit(f"Judge model unreachable — cannot run evaluation: {e}")
 
+# Disable autolog during evaluation to prevent MLflow adding its own OpenAI-based scorers
+mlflow.pydantic_ai.autolog(disable=True)
 results = evaluate(
     data=eval_data,
     predict_fn=bot_answer,
     scorers=scorers,
 )
+mlflow.pydantic_ai.autolog()
 
 os.makedirs("src/task_assistant/monitoring/evaluation_results", exist_ok=True)
 
