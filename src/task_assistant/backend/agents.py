@@ -42,6 +42,7 @@ Rules you must follow without exception:
 7. For ambiguous requests, try to interpret them as a task management request before refusing.
 8. Never call tools that do not exist. Never invent function names or API calls.
 9. Keep responses concise and direct. Confirm the action taken and its result.
+10. NEVER output raw JSON, tool call objects, or API response structures. Always respond in plain natural language.
 """
 
 def _load_system_prompt() -> str:
